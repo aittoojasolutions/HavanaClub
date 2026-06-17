@@ -1,0 +1,58 @@
+export const PRICES = {
+  dropIn: {
+    label: 'Drop-in',
+    amount: 2000, // cents
+    display: '€20',
+    priceId: process.env.STRIPE_PRICE_DROP_IN!,
+  },
+  pack8: {
+    label: '8-Class Pack',
+    amount: 14000,
+    display: '€140',
+    perClass: '€17.50',
+    classes: 8,
+    priceId: process.env.STRIPE_PRICE_PACK_8!,
+  },
+  pack16: {
+    label: '16-Class Pack',
+    amount: 24000,
+    display: '€240',
+    perClass: '€15',
+    classes: 16,
+    priceId: process.env.STRIPE_PRICE_PACK_16!,
+  },
+  pack32: {
+    label: '32-Class Pack',
+    amount: 40000,
+    display: '€400',
+    perClass: '€12.50',
+    classes: 32,
+    priceId: process.env.STRIPE_PRICE_PACK_32!,
+    bestValue: true,
+  },
+  sub1x: {
+    label: '1× per week',
+    amount: 6500,
+    display: '€65',
+    period: '/month',
+    classesPerWeek: 1,
+    priceId: process.env.STRIPE_PRICE_SUB_1X!,
+  },
+  sub2x: {
+    label: '2× per week',
+    amount: 11000,
+    display: '€110',
+    period: '/month',
+    classesPerWeek: 2,
+    priceId: process.env.STRIPE_PRICE_SUB_2X!,
+  },
+  sub3x: {
+    label: '3× per week',
+    amount: 15000,
+    display: '€150',
+    period: '/month',
+    classesPerWeek: 3,
+    priceId: process.env.STRIPE_PRICE_SUB_3X!,
+    bestValue: true,
+  },
+} as const
