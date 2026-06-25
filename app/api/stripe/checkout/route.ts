@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       mode: 'payment',
       line_items: [{ price: pack.priceId, quantity: 1 }],
-      success_url: `${baseUrl}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/booking-success?type=pack&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pricing`,
       metadata: { ...metadata, classes: String(pack.classes) },
     })
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         billing_cycle_anchor: billingAnchor,
         proration_behavior: 'create_prorations',
       } as any,
-      success_url: `${baseUrl}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/booking-success?type=sub&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/subscriptions`,
       metadata: { ...metadata, tier: String(tier) },
     })
