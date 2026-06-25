@@ -44,6 +44,7 @@ function BookingContent() {
   const [paymentType, setPaymentType] = useState<string>('')
   const [phone, setPhone] = useState('')
   const [customer, setCustomer] = useState<CustomerData | null>(null)
+  const [instanceId, setInstanceId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -58,13 +59,18 @@ function BookingContent() {
       }
       setUserEmail(user.email!)
 
-      // Fetch class and customer data in parallel
-      const [classRes, custRes] = await Promise.all([
+      // Fetch class, customer, and instance ID in parallel
+      const [classRes, custRes, instanceRes] = await Promise.all([
         fetch('/api/classes'),
         fetch(`/api/customer?email=${encodeURIComponent(user.email!)}`),
+        date ? fetch(`/api/classes/instance?class_id=${classId}&date=${date}`) : Promise.resolve(null),
       ])
       const classData = await classRes.json()
       const custData = await custRes.json()
+      if (instanceRes) {
+        const instanceData = await instanceRes.json()
+        setInstanceId(instanceData.instanceId || null)
+      }
 
       const found = classData.classes?.find((c: ClassData) => c.id === classId)
       setCls(found || null)
@@ -87,6 +93,12 @@ function BookingContent() {
     setLoading(true)
     setError('')
 
+    if (!instanceId) {
+      setError('Could not find this class session. Please go back and try again.')
+      setLoading(false)
+      return
+    }
+
     if (paymentType === 'pack' || paymentType === 'subscription') {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -94,7 +106,7 @@ function BookingContent() {
         body: JSON.stringify({
           customer_email: userEmail,
           customer_name: userName,
-          class_instance_id: classId,
+          class_instance_id: instanceId,
           role: cls?.is_pairwork ? role : 'general',
           booking_type: paymentType,
         }),
@@ -110,7 +122,7 @@ function BookingContent() {
           type: 'drop_in',
           email: userEmail,
           name: userName,
-          classInstanceId: classId,
+          classInstanceId: instanceId,
           role: cls?.is_pairwork ? role : 'general',
         }),
       })
