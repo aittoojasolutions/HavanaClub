@@ -1,8 +1,8 @@
 export const PRICES = {
   dropIn: {
     label: 'Drop-in',
-    amount: 2000, // cents
-    display: '€20',
+    amount: 2400, // cents
+    display: '€24',
     priceId: process.env.STRIPE_PRICE_DROP_IN!,
   },
   pack8: {
@@ -40,16 +40,16 @@ export const PRICES = {
   },
   sub2x: {
     label: '2× per week',
-    amount: 11000,
-    display: '€110',
+    amount: 8900,
+    display: '€89',
     period: '/month',
     classesPerWeek: 2,
     priceId: process.env.STRIPE_PRICE_SUB_2X!,
   },
   sub3x: {
     label: '3× per week',
-    amount: 15000,
-    display: '€150',
+    amount: 10900,
+    display: '€109',
     period: '/month',
     classesPerWeek: 3,
     priceId: process.env.STRIPE_PRICE_SUB_3X!,

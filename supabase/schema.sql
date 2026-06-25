@@ -45,6 +45,7 @@ create table customers (
   id uuid primary key default gen_random_uuid(),
   email text unique not null,
   name text not null,
+  auth_user_id uuid unique references auth.users(id) on delete set null,
   stripe_customer_id text unique,
   pack_credits_remaining int not null default 0,
   subscription_tier int check (subscription_tier in (1,2,3)),
@@ -71,6 +72,34 @@ create index on class_instances(date);
 create index on class_instances(class_id);
 create index on bookings(customer_email);
 create index on bookings(class_instance_id);
+
+-- Trial classes (admin-managed, updated every ~5 weeks)
+create table trial_classes (
+  id uuid primary key default gen_random_uuid(),
+  style dance_style not null,
+  date date not null,
+  start_time time not null default '18:00',
+  instructor text not null,
+  location text not null default 'Main Studio',
+  capacity int not null default 15,
+  created_at timestamptz default now()
+);
+
+-- Trial class signups (no payment — they pay €10 on site after class)
+create table trial_signups (
+  id uuid primary key default gen_random_uuid(),
+  trial_class_id uuid references trial_classes(id) on delete cascade,
+  name text not null,
+  email text not null,
+  phone text,
+  status text not null default 'confirmed', -- confirmed | cancelled | attended | converted
+  created_at timestamptz default now(),
+  unique(trial_class_id, email)
+);
+
+create index on trial_classes(date);
+create index on trial_signups(trial_class_id);
+create index on trial_signups(email);
 
 -- Seed data: 5 example classes
 insert into classes (title, style, instructor, day_of_week, start_time, is_recurring, is_pairwork, leader_capacity, follower_capacity, general_capacity, location) values

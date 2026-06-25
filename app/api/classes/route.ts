@@ -7,35 +7,36 @@ export async function GET(request: NextRequest) {
   const style = searchParams.get('style')
   const weekOffset = parseInt(searchParams.get('weekOffset') || '0')
 
-  const db = createServiceClient()
+  try {
+    const db = createServiceClient()
 
-  // Get all active classes
-  let query = db.from('classes').select('*').order('day_of_week').order('start_time')
-  if (style) query = query.eq('style', style)
+    let query = db.from('classes').select('*').order('day_of_week').order('start_time')
+    if (style) query = query.eq('style', style)
 
-  const { data: classes, error } = await query
+    const { data: classes, error } = await query
+    if (error) return NextResponse.json({ error: error.message, classes: [] }, { status: 500 })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    const today = new Date()
+    const startDate = new Date(today)
+    startDate.setDate(today.getDate() + weekOffset * 7)
+    const endDate = new Date(startDate)
+    endDate.setDate(startDate.getDate() + 7)
 
-  // Get upcoming instances for the next 4 weeks
-  const today = new Date()
-  const startDate = new Date(today)
-  startDate.setDate(today.getDate() + weekOffset * 7)
-  const endDate = new Date(startDate)
-  endDate.setDate(startDate.getDate() + 7)
+    const { data: instances } = await db
+      .from('class_instances')
+      .select('*, classes(*)')
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lt('date', endDate.toISOString().split('T')[0])
+      .eq('status', 'scheduled')
 
-  const { data: instances } = await db
-    .from('class_instances')
-    .select('*, classes(*)')
-    .gte('date', startDate.toISOString().split('T')[0])
-    .lt('date', endDate.toISOString().split('T')[0])
-    .eq('status', 'scheduled')
+    const classesWithInstances = (classes ?? []).map(cls => ({
+      ...cls,
+      nextDates: getNextOccurrences(cls.day_of_week, 8),
+    }))
 
-  // For recurring classes, generate virtual instances if DB doesn't have them
-  const classesWithInstances = classes?.map(cls => {
-    const nextDates = getNextOccurrences(cls.day_of_week, 8)
-    return { ...cls, nextDates }
-  })
-
-  return NextResponse.json({ classes: classesWithInstances, instances })
+    return NextResponse.json({ classes: classesWithInstances, instances: instances ?? [] })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Server error'
+    return NextResponse.json({ error: message, classes: [], instances: [] }, { status: 500 })
+  }
 }

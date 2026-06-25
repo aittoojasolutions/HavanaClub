@@ -1,7 +1,154 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAdmin } from '../layout'
 import { DAY_LABELS, DAYS_ORDER, formatTime } from '@/lib/utils'
+
+interface Teacher { id: string; name: string; photo_url: string | null }
+
+function InstructorPicker({ value, onChange, password }: {
+  value: string
+  onChange: (v: string) => void
+  password: string
+}) {
+  const [teachers, setTeachers] = useState<Teacher[]>([])
+  const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(false)
+  const [custom, setCustom] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!password) return
+    fetch('/api/admin/teachers', { headers: { 'x-admin-password': password } })
+      .then(r => r.json())
+      .then(d => setTeachers(d.teachers ?? []))
+  }, [password])
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = teachers.filter(t =>
+    t.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  function selectTeacher(name: string) {
+    onChange(name)
+    setSearch('')
+    setOpen(false)
+    setCustom(false)
+  }
+
+  function enableCustom() {
+    onChange('')
+    setCustom(true)
+    setOpen(false)
+    setSearch('')
+  }
+
+  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+
+  if (custom) {
+    return (
+      <div className="space-y-2">
+        <input
+          required
+          autoFocus
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder="Enter substitute name…"
+          className="w-full bg-[#0a0805] border border-[#c8932a]/50 rounded-lg px-4 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none"
+        />
+        <button type="button" onClick={() => { setCustom(false); onChange('') }}
+          className="text-xs text-[#9a8a72] hover:text-[#c8932a] transition-colors">
+          ← Back to teacher list
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={`w-full bg-[#0a0805] border rounded-lg px-4 py-2.5 text-left flex items-center gap-3 transition-colors ${
+          open ? 'border-[#c8932a]' : 'border-[#2a1f10] hover:border-[#c8932a]/40'
+        }`}
+      >
+        {value ? (
+          <>
+            <div className="w-6 h-6 rounded-full bg-[#c8932a]/20 border border-[#c8932a]/30 flex items-center justify-center text-[#c8932a] text-xs font-bold flex-shrink-0">
+              {initials(value)}
+            </div>
+            <span className="text-[#f5f0e8] flex-1">{value}</span>
+          </>
+        ) : (
+          <span className="text-[#4a3a28] flex-1">Select instructor…</span>
+        )}
+        <svg className={`w-4 h-4 text-[#9a8a72] transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-30 top-full mt-1 w-full bg-[#141008] border border-[#2a1f10] rounded-xl shadow-2xl overflow-hidden">
+          {/* Search */}
+          <div className="p-2 border-b border-[#2a1f10]">
+            <input
+              autoFocus
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search teachers…"
+              className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none text-sm"
+            />
+          </div>
+
+          <div className="max-h-52 overflow-y-auto">
+            {filtered.length === 0 && (
+              <div className="px-4 py-3 text-[#9a8a72] text-sm">No teachers found</div>
+            )}
+            {filtered.map(t => (
+              <button key={t.id} type="button" onClick={() => selectTeacher(t.name)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#2a1f10]/50 transition-colors text-left">
+                {t.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={t.photo_url} alt={t.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[#c8932a]/20 border border-[#c8932a]/30 flex items-center justify-center text-[#c8932a] text-xs font-bold flex-shrink-0">
+                    {initials(t.name)}
+                  </div>
+                )}
+                <span className="text-[#f5f0e8] text-sm">{t.name}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Custom option */}
+          <div className="border-t border-[#2a1f10]">
+            <button type="button" onClick={enableCustom}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#2a1f10]/50 transition-colors text-left">
+              <div className="w-7 h-7 rounded-full bg-[#2a1f10] border border-[#3a2f20] flex items-center justify-center text-[#9a8a72] text-xs flex-shrink-0">
+                ✎
+              </div>
+              <div>
+                <div className="text-[#9a8a72] text-sm font-medium">Custom / Substitution</div>
+                <div className="text-[#4a3a28] text-xs">Type a name for a one-off substitute</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface ClassData {
   id: string
@@ -126,9 +273,7 @@ export default function AdminClassesPage() {
 
             <div>
               <label className="block text-sm text-[#9a8a72] mb-1">Instructor *</label>
-              <input required value={form.instructor} onChange={e => set('instructor', e.target.value)}
-                placeholder="e.g. Carlos M."
-                className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none" />
+              <InstructorPicker value={form.instructor} onChange={v => set('instructor', v)} password={password} />
             </div>
 
             <div>

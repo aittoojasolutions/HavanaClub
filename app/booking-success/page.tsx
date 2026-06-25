@@ -1,10 +1,11 @@
 import Link from 'next/link'
+import { Sparkles } from '@/components/Icons'
 
 export default function BookingSuccess() {
   return (
     <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="text-6xl mb-6">🎉</div>
+        <Sparkles className="w-16 h-16 mb-6 mx-auto text-[#c8932a]" />
         <h1 className="text-3xl font-bold mb-4">You&apos;re Booked!</h1>
         <p className="text-[#9a8a72] mb-8 leading-relaxed">
           Your booking is confirmed. We&apos;ll send a confirmation to your email shortly. See you on the dance floor!

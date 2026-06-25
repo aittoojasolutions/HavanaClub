@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { PRICES } from '@/lib/prices'
+import { Ticket } from '@/components/Icons'
 
 type Tab = 'packs' | 'subscriptions' | 'dropin'
 
@@ -108,7 +109,7 @@ export default function PricingPage() {
                 <div className="text-[#c8932a] text-sm mb-6">{sub.classesPerWeek} class{sub.classesPerWeek > 1 ? 'es' : ''}/week</div>
                 <ul className="space-y-2 text-sm text-[#9a8a72] mb-8 flex-1">
                   <li>✓ Book any day Mon–Sun</li>
-                  <li>✓ Salsa & Bachata included</li>
+                  <li>✓ Cuban Salsa & Bachata included</li>
                   <li>✓ Cancel anytime</li>
                   <li>✓ {sub.classesPerWeek * 4}+ classes/month</li>
                 </ul>
@@ -131,13 +132,13 @@ export default function PricingPage() {
       {tab === 'dropin' && (
         <div className="max-w-sm mx-auto">
           <div className="bg-[#141008] border-2 border-[#2a1f10] rounded-2xl p-8 text-center">
-            <div className="text-5xl mb-4">🎟️</div>
+            <Ticket className="w-14 h-14 mb-4 mx-auto text-[#c8932a]" />
             <h3 className="text-2xl font-bold mb-2">Single Class</h3>
             <div className="text-5xl font-bold text-[#c8932a] mb-2">{PRICES.dropIn.display}</div>
             <div className="text-[#9a8a72] text-sm mb-6">Per class · No commitment</div>
             <ul className="space-y-2 text-sm text-[#9a8a72] mb-8 text-left">
               <li>✓ Book any class</li>
-              <li>✓ Salsa or Bachata</li>
+              <li>✓ Cuban Salsa or Bachata</li>
               <li>✓ Pay as you go</li>
               <li>✓ Perfect for trying us out</li>
             </ul>
@@ -152,7 +153,7 @@ export default function PricingPage() {
       {/* FAQ row */}
       <div className="mt-16 grid md:grid-cols-2 gap-6">
         {[
-          { q: 'Can I use credits for any class?', a: 'Yes — class pack credits and memberships work for all Salsa and Bachata classes.' },
+          { q: 'Can I use credits for any class?', a: 'Yes — class pack credits and memberships work for all Cuban Salsa and Bachata classes.' },
           { q: 'Do credits expire?', a: 'Class pack credits never expire. Use them at your own pace.' },
           { q: 'Can I cancel my membership?', a: 'Yes, cancel anytime from your dashboard. No cancellation fees.' },
           { q: 'Is there a trial class?', a: 'Your first drop-in class is a great way to try us out before committing to a pack or membership.' },

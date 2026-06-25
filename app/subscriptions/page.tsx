@@ -20,7 +20,7 @@ const tiers: Record<Tier, {
     desc: 'Perfect for getting started. One class per week at your own pace.',
     perks: [
       'Book 1 class per week (any day, Mon–Sun)',
-      'Choose any Salsa or Bachata class',
+      'Choose any Cuban Salsa or Bachata class',
       'Switch styles week to week',
       'Cancel anytime — no fees',
       'Access to beginner workshops',
@@ -34,7 +34,7 @@ const tiers: Record<Tier, {
     desc: 'The most popular plan. Two classes a week builds real rhythm and technique.',
     perks: [
       'Book 2 classes per week (any day, Mon–Sun)',
-      'Mix Salsa and Bachata freely',
+      'Mix Cuban Salsa and Bachata freely',
       'Priority booking for popular classes',
       'Cancel anytime — no fees',
       'Access to beginner workshops',
@@ -164,10 +164,10 @@ export default function SubscriptionsPage() {
             </thead>
             <tbody>
               {[
-                ['Monthly price', '€65', '€110', '€150'],
+                ['Monthly price', '€65', '€89', '€109'],
                 ['Classes per week', '1', '2', '3'],
                 ['Any day (Mon–Sun)', '✓', '✓', '✓'],
-                ['Salsa & Bachata', '✓', '✓', '✓'],
+                ['Cuban Salsa & Bachata', '✓', '✓', '✓'],
                 ['Priority booking', '—', '✓', '✓'],
                 ['Monthly feedback', '—', '✓', '✓'],
                 ['Social events', '—', '—', '✓'],

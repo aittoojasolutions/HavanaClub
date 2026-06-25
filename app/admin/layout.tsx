@@ -55,7 +55,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navLinks = [
     ['/admin', 'Dashboard'],
+    ['/admin/analytics', 'Analytics'],
+    ['/admin/teachers', 'Teachers'],
+    ['/admin/events', 'Events'],
     ['/admin/classes', 'Manage Classes'],
+    ['/admin/trial-classes', 'Trial Classes'],
+    ['/admin/members', 'Members'],
+    ['/admin/salary', 'Salary'],
   ]
 
   return (
