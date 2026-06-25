@@ -1,9 +1,9 @@
 export const PRICES = {
   dropIn: {
     label: 'Drop-in',
-    amount: 2500, // cents
-    display: '€25',
-    perHour: '€16.70/h',
+    amount: 2400, // cents
+    display: '€24',
+    perHour: '€16.00/h',
     priceId: process.env.STRIPE_PRICE_DROP_IN!,
   },
   pack8: {
