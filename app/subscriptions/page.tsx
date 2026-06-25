@@ -97,9 +97,10 @@ export default function SubscriptionsPage() {
   return (
     <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Memberships</h1>
+        <p className="text-[#c8932a] uppercase tracking-widest text-xs font-semibold mb-3">Memberships</p>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">Join the Club</h1>
         <p className="text-[#9a8a72] text-lg max-w-xl mx-auto">
-          A membership means you show up. And when you show up consistently, you dance.
+          Choose your rhythm — and when you show up consistently, you dance.
         </p>
       </div>
 
