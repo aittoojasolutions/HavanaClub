@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { PRICES } from '@/lib/prices'
+import { createClient } from '@/lib/supabase-browser'
 
 type Tier = '1x' | '2x' | '3x'
 
@@ -75,21 +77,40 @@ const faqs = [
 export default function SubscriptionsPage() {
   const [active, setActive] = useState<Tier>('2x')
   const [loading, setLoading] = useState(false)
+  const [modal, setModal] = useState<{ key: string } | null>(null)
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [modalError, setModalError] = useState('')
 
   async function startCheckout(key: string) {
-    const email = prompt('Enter your email:')
-    if (!email) return
-    const name = prompt('Your full name:')
-    if (!name) return
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.email) {
+      const res = await fetch(`/api/customer?email=${encodeURIComponent(user.email)}`)
+      const data = await res.json()
+      await goToCheckout(key, user.email, data.customer?.name || user.email)
+    } else {
+      setModal({ key }); setEmail(''); setName(''); setModalError('')
+    }
+  }
+
+  async function goToCheckout(key: string, userEmail: string, userName: string) {
     setLoading(true)
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: key, email, name }),
+      body: JSON.stringify({ type: key, email: userEmail, name: userName }),
     })
     const data = await res.json()
     if (data.url) window.location.href = data.url
-    else { alert(data.error || 'Error'); setLoading(false) }
+    else { setLoading(false); setModalError(data.error || 'Something went wrong.') }
+  }
+
+  async function submitModal() {
+    if (!modal) return
+    if (!email.trim() || !name.trim()) { setModalError('Please fill in both fields.'); return }
+    setModal(null)
+    await goToCheckout(modal.key, email.trim(), name.trim())
   }
 
   const current = tiers[active]
@@ -207,6 +228,42 @@ export default function SubscriptionsPage() {
           ))}
         </div>
       </div>
+
+      {/* Guest checkout modal */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => { setModal(null); setLoading(false) }}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative bg-[#0f0c07] border border-[#2a1f10] rounded-2xl p-6 max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-1">Almost there</h2>
+            <p className="text-[#9a8a72] text-sm mb-5">Enter your details to continue to checkout.</p>
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-xs text-[#9a8a72] mb-1">Email</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com" autoFocus
+                  onKeyDown={e => e.key === 'Enter' && submitModal()}
+                  className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs text-[#9a8a72] mb-1">Full name</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)}
+                  placeholder="Your name"
+                  onKeyDown={e => e.key === 'Enter' && submitModal()}
+                  className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+              </div>
+            </div>
+            {modalError && <p className="text-red-400 text-xs mb-3">{modalError}</p>}
+            <button onClick={submitModal}
+              className="w-full bg-[#c8932a] text-[#0a0805] py-3 rounded-lg font-bold hover:bg-[#a87820] transition-colors mb-2">
+              Continue to Checkout
+            </button>
+            <p className="text-[#9a8a72] text-xs text-center">
+              Already have an account?{' '}
+              <Link href="/login" className="text-[#c8932a] hover:underline">Sign in</Link>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
