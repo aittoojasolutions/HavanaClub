@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
+import { sendTrialConfirmation } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Check capacity
     const { data: cls } = await db
       .from('trial_classes')
-      .select('capacity, trial_signups(count)')
+      .select('capacity, style, date, start_time, location, instructor, trial_signups(count)')
       .eq('id', trial_class_id)
       .single()
 
@@ -49,6 +50,19 @@ export async function POST(request: NextRequest) {
       phone: phone?.trim() || null,
       age: age ? parseInt(age) : null,
     }, { onConflict: 'email' })
+
+    // Send confirmation email (non-blocking)
+    if (cls) {
+      sendTrialConfirmation({
+        to: cleanEmail,
+        firstName: first_name.trim(),
+        style: cls.style as 'salsa' | 'bachata',
+        date: cls.date,
+        startTime: cls.start_time,
+        location: cls.location,
+        instructor: cls.instructor,
+      }).catch(err => console.error('Email send failed:', err))
+    }
 
     return NextResponse.json({ signup: data }, { status: 201 })
   } catch {
