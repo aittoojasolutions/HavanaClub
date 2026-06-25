@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { formatTime, addMinutes } from '@/lib/utils'
 import Link from 'next/link'
@@ -36,12 +36,18 @@ const SUB_LABELS: Record<number, string> = {
   3: '3× per week — €169/mo',
 }
 
+type CancelStep = 'idle' | 'confirm' | 'options' | 'done'
+
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<{ email: string } | null>(null)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const [cancelStep, setCancelStep] = useState<CancelStep>('idle')
+  const [cancelData, setCancelData] = useState<{ cancelAt: string; pastMinimum: boolean } | null>(null)
+  const [cancelWorking, setCancelWorking] = useState(false)
+  const [convertData, setConvertData] = useState<{ credits: number; expiresAt: string } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -76,6 +82,45 @@ export default function DashboardPage() {
     })
     const data = await res.json()
     if (data.url) window.location.href = data.url
+  }
+
+  const refreshCustomer = useCallback(async (email: string) => {
+    const res = await fetch(`/api/customer?email=${encodeURIComponent(email)}`)
+    const data = await res.json()
+    setCustomer(data.customer)
+  }, [])
+
+  async function confirmCancel() {
+    if (!user) return
+    setCancelWorking(true)
+    const res = await fetch('/api/stripe/cancel-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email }),
+    })
+    const data = await res.json()
+    setCancelWorking(false)
+    if (res.ok) {
+      setCancelData(data)
+      setCancelStep(data.pastMinimum ? 'options' : 'done')
+    }
+  }
+
+  async function convertToPack() {
+    if (!user) return
+    setCancelWorking(true)
+    const res = await fetch('/api/stripe/convert-to-pack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email }),
+    })
+    const data = await res.json()
+    setCancelWorking(false)
+    if (res.ok) {
+      setConvertData(data)
+      setCancelStep('done')
+      await refreshCustomer(user.email)
+    }
   }
 
   if (loading) {
@@ -146,21 +191,16 @@ export default function DashboardPage() {
           {customer?.subscription_tier ? (
             <>
               <div className="text-lg font-bold">{customer.subscription_tier}×/week</div>
-              <div className="text-[#9a8a72] text-xs mt-1">
-                {SUB_LABELS[customer.subscription_tier]}
+              <div className="text-[#9a8a72] text-xs mt-1">{SUB_LABELS[customer.subscription_tier]}</div>
+              <div className="flex gap-3 mt-2">
+                <button onClick={manageSubscription} className="text-xs text-[#c8932a] hover:underline">Manage →</button>
+                <button onClick={() => setCancelStep('confirm')} className="text-xs text-red-400 hover:underline">Cancel</button>
               </div>
-              <button onClick={manageSubscription}
-                className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">
-                Manage →
-              </button>
             </>
           ) : (
             <>
               <div className="text-lg font-bold text-[#9a8a72]">None</div>
-              <Link href="/subscriptions"
-                className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">
-                Get a membership →
-              </Link>
+              <Link href="/subscriptions" className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">Get a membership →</Link>
             </>
           )}
         </div>
@@ -190,6 +230,98 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-4 text-[#9a8a72]">Recent Classes</h2>
           <div className="space-y-3 opacity-60">
             {past.map(b => <BookingRow key={b.id} b={b} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Cancel subscription modal */}
+      {cancelStep !== 'idle' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => !cancelWorking && setCancelStep('idle')}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative bg-[#0f0c07] border border-[#2a1f10] rounded-2xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+
+            {/* Step 1: Confirm */}
+            {cancelStep === 'confirm' && (
+              <>
+                <h2 className="text-xl font-bold mb-2">Cancel your membership?</h2>
+                <p className="text-[#9a8a72] text-sm mb-6">
+                  Your membership includes a 3-month minimum commitment. If you cancel now, your access will remain active until your commitment period ends — you won&apos;t lose any classes you&apos;re entitled to.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setCancelStep('idle')}
+                    className="flex-1 py-2.5 rounded-lg border border-[#2a1f10] text-[#f5f0e8] hover:bg-[#1a1208] transition-colors text-sm font-medium">
+                    Keep my membership
+                  </button>
+                  <button onClick={confirmCancel} disabled={cancelWorking}
+                    className="flex-1 py-2.5 rounded-lg bg-red-900/40 border border-red-700/40 text-red-300 hover:bg-red-900/60 transition-colors text-sm font-medium disabled:opacity-50">
+                    {cancelWorking ? 'Processing…' : 'Yes, cancel'}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* Step 2: Options (past minimum) */}
+            {cancelStep === 'options' && cancelData && (
+              <>
+                <h2 className="text-xl font-bold mb-2">How would you like to cancel?</h2>
+                <p className="text-[#9a8a72] text-sm mb-5">Choose what happens to your remaining time this billing period.</p>
+                <div className="space-y-3 mb-5">
+                  <div className="bg-[#141008] border border-[#2a1f10] rounded-xl p-4">
+                    <div className="font-semibold text-sm mb-1">Cancel at end of period</div>
+                    <div className="text-[#9a8a72] text-xs">
+                      Access until {new Date(cancelData.cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. Already scheduled.
+                    </div>
+                    <div className="text-green-400 text-xs mt-1">✓ Cancellation confirmed</div>
+                  </div>
+                  <div className="bg-[#141008] border border-[#c8932a]/30 rounded-xl p-4">
+                    <div className="font-semibold text-sm mb-1">Convert remaining time to a class pack</div>
+                    <div className="text-[#9a8a72] text-xs mb-3">
+                      Cancel immediately and receive class credits for your unused time. Credits valid for 6 months.
+                    </div>
+                    <button onClick={convertToPack} disabled={cancelWorking}
+                      className="w-full py-2 rounded-lg bg-[#c8932a] text-[#0a0805] text-sm font-bold hover:bg-[#a87820] transition-colors disabled:opacity-50">
+                      {cancelWorking ? 'Converting…' : 'Convert to class pack'}
+                    </button>
+                  </div>
+                </div>
+                <button onClick={() => setCancelStep('idle')} className="text-xs text-[#9a8a72] hover:text-[#f5f0e8] transition-colors">
+                  Close
+                </button>
+              </>
+            )}
+
+            {/* Done */}
+            {cancelStep === 'done' && (
+              <>
+                <div className="text-2xl mb-3">✓</div>
+                {convertData ? (
+                  <>
+                    <h2 className="text-xl font-bold mb-2">Converted to class pack</h2>
+                    <p className="text-[#9a8a72] text-sm mb-1">
+                      Your subscription has been cancelled and <span className="text-[#c8932a] font-semibold">{convertData.credits} class credit{convertData.credits !== 1 ? 's' : ''}</span> have been added to your account.
+                    </p>
+                    <p className="text-[#9a8a72] text-sm mb-5">
+                      Credits valid until {new Date(convertData.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.
+                    </p>
+                  </>
+                ) : cancelData ? (
+                  <>
+                    <h2 className="text-xl font-bold mb-2">Cancellation confirmed</h2>
+                    <p className="text-[#9a8a72] text-sm mb-5">
+                      Your membership will remain active until{' '}
+                      <span className="text-[#f5f0e8] font-semibold">
+                        {new Date(cancelData.cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </span>.
+                      You can keep booking classes until then.
+                    </p>
+                  </>
+                ) : null}
+                <button onClick={() => setCancelStep('idle')}
+                  className="w-full py-2.5 rounded-lg bg-[#2a1f10] text-[#f5f0e8] text-sm font-medium hover:bg-[#3a2f20] transition-colors">
+                  Close
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

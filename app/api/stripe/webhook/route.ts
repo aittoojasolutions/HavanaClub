@@ -80,6 +80,20 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (event.type === 'customer.subscription.updated') {
+    const sub = event.data.object as Stripe.Subscription
+    if (sub.status === 'active') {
+      // Sync tier in case customer upgraded/downgraded via portal
+      const item = sub.items.data[0]
+      const meta = item?.price?.metadata
+      if (meta?.tier) {
+        await db.from('customers')
+          .update({ subscription_tier: parseInt(meta.tier) })
+          .eq('subscription_stripe_id', sub.id)
+      }
+    }
+  }
+
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object as Stripe.Subscription
     await db.from('customers')
