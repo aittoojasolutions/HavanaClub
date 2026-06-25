@@ -1,6 +1,8 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 // Sending address — switch to hello@habanaclub.fi once domain is verified in Resend
 const FROM = 'Habana Club <onboarding@resend.dev>'
@@ -124,7 +126,7 @@ export async function sendTrialConfirmation({
 </html>
 `
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `You're confirmed: ${styleName} trial class on ${dateDisplay}`,
