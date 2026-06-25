@@ -50,7 +50,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-bold text-[#f5f0e8] mb-3">4. Class packs</h2>
           <div className="space-y-3 text-sm">
-            <p>Class pack credits do not expire and can be used for any Cuban Salsa or Bachata class.</p>
+            <p>Class pack credits are valid from the date of purchase: 8-class packs for 2 months, 16-class packs for 3 months, and 32-class packs for 6 months. Credits expire at the end of the validity period regardless of usage.</p>
             <p>Class packs are non-transferable and personal to the purchaser.</p>
             <p>Class packs are non-refundable once purchased, except where required by Finnish consumer protection law.</p>
             <p>Credits are deducted at the time of booking. If you cancel a booked class with more than 24 hours notice, the credit is returned to your account. Cancellations with less than 24 hours notice or no-shows will result in the credit being forfeited.</p>

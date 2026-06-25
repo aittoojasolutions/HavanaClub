@@ -73,13 +73,11 @@ export default function PricingPage() {
               )}
               <div className="text-[#9a8a72] text-sm font-medium mb-2">{pack.label}</div>
               <div className="text-4xl font-bold mb-1">{pack.display}</div>
-              {'perClass' in pack && (
-                <div className="text-[#c8932a] text-sm mb-6">{'perClass' in pack ? pack.perClass : ''} per class</div>
-              )}
+              <div className="text-[#c8932a] text-sm mb-6">{'perHour' in pack ? pack.perHour : ''}</div>
               <ul className="space-y-2 text-sm text-[#9a8a72] mb-8 flex-1">
-                {'classes' in pack && <li>✓ {'classes' in pack ? pack.classes : ''} classes total</li>}
-                <li>✓ Valid for all styles</li>
-                <li>✓ No expiry date</li>
+                {'classes' in pack && <li>✓ {pack.classes} classes · 90 min each</li>}
+                {'validity' in pack && <li>✓ Valid for {pack.validity}</li>}
+                <li>✓ Cuban Salsa & Bachata</li>
                 <li>✓ Book any class anytime</li>
               </ul>
               <button onClick={() => startCheckout(pack.key)} disabled={loading === pack.key}
@@ -106,7 +104,8 @@ export default function PricingPage() {
                 )}
                 <div className="text-[#9a8a72] text-sm font-medium mb-2">{sub.label}</div>
                 <div className="text-4xl font-bold mb-1">{sub.display}<span className="text-lg font-normal text-[#9a8a72]">/mo</span></div>
-                <div className="text-[#c8932a] text-sm mb-6">{sub.classesPerWeek} class{sub.classesPerWeek > 1 ? 'es' : ''}/week</div>
+                <div className="text-[#c8932a] text-sm mb-1">{'perHour' in sub ? sub.perHour : ''}</div>
+                <div className="text-[#9a8a72] text-xs mb-6">{sub.classesPerWeek} class{sub.classesPerWeek > 1 ? 'es' : ''}/week</div>
                 <ul className="space-y-2 text-sm text-[#9a8a72] mb-8 flex-1">
                   <li>✓ Book any day Mon–Sun</li>
                   <li>✓ Cuban Salsa & Bachata included</li>
@@ -135,7 +134,8 @@ export default function PricingPage() {
             <Ticket className="w-14 h-14 mb-4 mx-auto text-[#c8932a]" />
             <h3 className="text-2xl font-bold mb-2">Single Class</h3>
             <div className="text-5xl font-bold text-[#c8932a] mb-2">{PRICES.dropIn.display}</div>
-            <div className="text-[#9a8a72] text-sm mb-6">Per class · No commitment</div>
+            <div className="text-[#c8932a] text-sm mb-1">{PRICES.dropIn.perHour}</div>
+            <div className="text-[#9a8a72] text-xs mb-6">Per class · 90 min · No commitment</div>
             <ul className="space-y-2 text-sm text-[#9a8a72] mb-8 text-left">
               <li>✓ Book any class</li>
               <li>✓ Cuban Salsa or Bachata</li>
@@ -154,7 +154,7 @@ export default function PricingPage() {
       <div className="mt-16 grid md:grid-cols-2 gap-6">
         {[
           { q: 'Can I use credits for any class?', a: 'Yes — class pack credits and memberships work for all Cuban Salsa and Bachata classes.' },
-          { q: 'Do credits expire?', a: 'Class pack credits never expire. Use them at your own pace.' },
+          { q: 'Do credits expire?', a: 'Yes — 8-class packs are valid for 2 months, 16-class for 3 months, and 32-class for 6 months from date of purchase.' },
           { q: 'Can I cancel my membership?', a: 'Yes, cancel anytime from your dashboard. No cancellation fees.' },
           { q: 'Is there a trial class?', a: 'Your first drop-in class is a great way to try us out before committing to a pack or membership.' },
         ].map(faq => (

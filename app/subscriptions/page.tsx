@@ -7,6 +7,7 @@ type Tier = '1x' | '2x' | '3x'
 const tiers: Record<Tier, {
   label: string
   price: string
+  perHour: string
   classesPerWeek: number
   key: string
   perks: string[]
@@ -15,6 +16,7 @@ const tiers: Record<Tier, {
   '1x': {
     label: '1× per week',
     price: PRICES.sub1x.display,
+    perHour: PRICES.sub1x.perHour,
     classesPerWeek: 1,
     key: 'sub_1x',
     desc: 'Perfect for getting started. One class per week at your own pace.',
@@ -29,6 +31,7 @@ const tiers: Record<Tier, {
   '2x': {
     label: '2× per week',
     price: PRICES.sub2x.display,
+    perHour: PRICES.sub2x.perHour,
     classesPerWeek: 2,
     key: 'sub_2x',
     desc: 'The most popular plan. Two classes a week builds real rhythm and technique.',
@@ -44,6 +47,7 @@ const tiers: Record<Tier, {
   '3x': {
     label: '3× per week',
     price: PRICES.sub3x.display,
+    perHour: PRICES.sub3x.perHour,
     classesPerWeek: 3,
     key: 'sub_3x',
     desc: 'For the dedicated dancer. Three classes a week for rapid progression.',
@@ -136,7 +140,8 @@ export default function SubscriptionsPage() {
             <div className="bg-[#0a0805] border border-[#2a1f10] rounded-xl p-6 text-center">
               <div className="text-[#9a8a72] text-sm mb-1">Monthly price</div>
               <div className="text-5xl font-bold text-[#c8932a] mb-1">{current.price}</div>
-              <div className="text-[#9a8a72] text-sm mb-6">per month · cancel anytime</div>
+              <div className="text-[#c8932a] text-sm font-medium mb-1">{current.perHour}</div>
+              <div className="text-[#9a8a72] text-xs mb-6">per month · cancel anytime</div>
               <button onClick={() => startCheckout(current.key)} disabled={loading}
                 className="w-full bg-[#c8932a] text-[#0a0805] py-3 rounded-lg font-bold hover:bg-[#a87820] transition-colors disabled:opacity-50">
                 {loading ? 'Loading…' : 'Start Membership'}
