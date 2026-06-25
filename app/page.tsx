@@ -106,7 +106,7 @@ export default function Home() {
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Dance Your Way.
-            <span className="block text-[#c8932a]">Havana Club.</span>
+            <span className="block text-[#c8932a]">Habana Club.</span>
           </h1>
           <p className="text-xl text-[#9a8a72] mb-10 max-w-2xl mx-auto leading-relaxed">
             Weekly Cuban Salsa and Bachata classes for all levels. From your first step to the dance floor — we&apos;re with you every beat of the way.
@@ -141,7 +141,7 @@ export default function Home() {
       {/* Features */}
       <section className="py-24 px-4 bg-[#141008]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 reveal">Why Havana Club?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 reveal">Why Habana Club?</h2>
           <p className="text-[#9a8a72] text-center mb-16 max-w-xl mx-auto reveal">We believe dance changes lives. Here&apos;s what makes our studio different.</p>
           <div className="grid md:grid-cols-3 gap-8 reveal-stagger">
             {features.map(f => (

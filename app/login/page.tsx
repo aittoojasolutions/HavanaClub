@@ -117,7 +117,7 @@ function LoginForm() {
 
       <div className="mt-6 pt-6 border-t border-[#2a1f10] text-center space-y-2">
         <p className="text-xs text-[#9a8a72]">
-          New to Havana Club?{' '}
+          New to Habana Club?{' '}
           <Link href="/first-timers" className="text-[#c8932a] hover:underline font-medium">
             Try a free trial class first
           </Link>

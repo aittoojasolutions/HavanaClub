@@ -1,13 +1,13 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Privacy Policy — Havana Club Dance Studio',
-  description: 'How Havana Club collects, uses, and protects your personal data under GDPR.',
+  title: 'Privacy Policy — Habana Club Dance Studio',
+  description: 'How Habana Club collects, uses, and protects your personal data under GDPR.',
 }
 
 const LAST_UPDATED = 'June 2026'
 const CONTROLLER_EMAIL = 'hello@havanaclub.fi'
-const CONTROLLER_NAME = 'Havana Club Dance Studio'
+const CONTROLLER_NAME = 'Habana Club Dance Studio'
 const CONTROLLER_ADDRESS = 'Sörnäisten rantatie 33C, 00500 Helsinki, Finland'
 
 export default function PrivacyPage() {
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-bold text-[#f5f0e8] mb-3">1. Who we are</h2>
           <p>
-            {CONTROLLER_NAME} (&quot;Havana Club&quot;, &quot;we&quot;, &quot;us&quot;) is the data controller responsible for your personal data.
+            {CONTROLLER_NAME} (&quot;Habana Club&quot;, &quot;we&quot;, &quot;us&quot;) is the data controller responsible for your personal data.
           </p>
           <div className="bg-[#141008] border border-[#2a1f10] rounded-xl p-5 mt-4 text-sm space-y-1">
             <p><span className="text-[#f5f0e8] font-medium">Business name:</span> {CONTROLLER_NAME}</p>

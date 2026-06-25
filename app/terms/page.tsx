@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Terms of Service — Havana Club Dance Studio',
-  description: 'Terms and conditions for using Havana Club Dance Studio services.',
+  title: 'Terms of Service — Habana Club Dance Studio',
+  description: 'Terms and conditions for using Habana Club Dance Studio services.',
 }
 
 const LAST_UPDATED = 'June 2026'
@@ -22,10 +22,10 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-bold text-[#f5f0e8] mb-3">1. About these terms</h2>
           <p>
-            These Terms of Service govern your use of Havana Club Dance Studio&apos;s classes, website, and related services. By booking a class or purchasing a product, you agree to these terms. Please read them before making a booking.
+            These Terms of Service govern your use of Habana Club Dance Studio&apos;s classes, website, and related services. By booking a class or purchasing a product, you agree to these terms. Please read them before making a booking.
           </p>
           <p className="mt-3">
-            The service is provided by Havana Club Dance Studio, Sörnäisten rantatie 33C, 00500 Helsinki, Finland (<a href={`mailto:${CONTACT_EMAIL}`} className="text-[#c8932a] hover:underline">{CONTACT_EMAIL}</a>).
+            The service is provided by Habana Club Dance Studio, Sörnäisten rantatie 33C, 00500 Helsinki, Finland (<a href={`mailto:${CONTACT_EMAIL}`} className="text-[#c8932a] hover:underline">{CONTACT_EMAIL}</a>).
           </p>
         </section>
 
@@ -97,14 +97,14 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-bold text-[#f5f0e8] mb-3">9. Intellectual property</h2>
           <p className="text-sm">
-            All content on this website — including text, images, videos, and design — is owned by Havana Club Dance Studio and may not be reproduced or distributed without our permission.
+            All content on this website — including text, images, videos, and design — is owned by Habana Club Dance Studio and may not be reproduced or distributed without our permission.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold text-[#f5f0e8] mb-3">10. Limitation of liability</h2>
           <p className="text-sm">
-            To the extent permitted by Finnish law, Havana Club Dance Studio is not liable for indirect, incidental, or consequential damages arising from use of our services. Our total liability to you shall not exceed the amount you paid for the service in question.
+            To the extent permitted by Finnish law, Habana Club Dance Studio is not liable for indirect, incidental, or consequential damages arising from use of our services. Our total liability to you shall not exceed the amount you paid for the service in question.
           </p>
         </section>
 

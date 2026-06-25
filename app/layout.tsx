@@ -6,10 +6,10 @@ import { ScrollAnimations } from '@/components/ScrollAnimations'
 import CookieBanner from '@/components/CookieBanner'
 
 export const metadata: Metadata = {
-  title: 'Havana Club Dance Studio',
+  title: 'Habana Club Dance Studio',
   description: 'Cuban Salsa & Bachata classes in a warm, welcoming community. Book your first class today.',
   openGraph: {
-    title: 'Havana Club Dance Studio',
+    title: 'Habana Club Dance Studio',
     description: 'Cuban Salsa & Bachata classes for all levels. Weekly schedule, packs & subscriptions.',
     type: 'website',
   },

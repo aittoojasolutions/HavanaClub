@@ -9,7 +9,7 @@ const salsa = {
   feel: 'Upbeat · Circular · Deeply Social',
   description: [
     'Cuban Salsa is the original — born from Cuban son, mambo, and Afro-Cuban rhythms, it is the foundation from which all Latin dance culture grew. Circular, grounded, and deeply improvisational, it feels unlike any other partner dance.',
-    'At Havana Club we teach authentic Cuban Salsa — Casino style, the way it\'s danced on the streets and in the casas de la trova in Havana. Expect rueda, partner work, and music that makes it impossible to stand still.',
+    'At Habana Club we teach authentic Cuban Salsa — Casino style, the way it\'s danced on the streets and in the casas de la trova in Havana. Expect rueda, partner work, and music that makes it impossible to stand still.',
     'Cuban Salsa is your ticket to dance floors across the world. The culture around it is vibrant, social, and welcoming — and once you start, you never really stop.',
   ],
   whatYouLearn: [

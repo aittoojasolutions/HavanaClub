@@ -106,7 +106,7 @@ function PrintableReport({ instructor, month, summary }: {
         .badge-bachata { background: #f3e5f5; color: #6a1b9a; }
       </style></head><body>
       <h1>Salary Report — ${instructor}</h1>
-      <div class="sub">${monthLabel(month)} · Havana Club Dance Studio</div>
+      <div class="sub">${monthLabel(month)} · Habana Club Dance Studio</div>
       <table>
         <thead><tr><th>Date</th><th>Class</th><th>Style</th><th>Attendees</th><th>Pay</th></tr></thead>
         <tbody>
@@ -126,7 +126,7 @@ function PrintableReport({ instructor, month, summary }: {
           </tr>
         </tbody>
       </table>
-      <div class="footer">Generated ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · Havana Club</div>
+      <div class="footer">Generated ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · Habana Club</div>
       </body></html>
     `)
     w.document.close()

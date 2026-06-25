@@ -32,11 +32,11 @@ export default function AboutPage() {
       <section className="max-w-4xl mx-auto text-center mb-20 reveal">
         <p className="text-[#c8932a] uppercase tracking-widest text-xs font-semibold mb-4">Our Story</p>
         <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-          We Started Havana Club<br />
+          We Started Habana Club<br />
           <span className="text-[#c8932a]">Because Helsinki Deserved Better.</span>
         </h1>
         <p className="text-[#9a8a72] text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
-          Latin dance in Helsinki had a ceiling. Great talent, but nowhere to consistently learn and grow with other serious dancers. So we built Havana Club — a place with real instruction, real music, and a community that keeps you coming back.
+          Latin dance in Helsinki had a ceiling. Great talent, but nowhere to consistently learn and grow with other serious dancers. So we built Habana Club — a place with real instruction, real music, and a community that keeps you coming back.
         </p>
       </section>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-5">From a single class to a full community</h2>
             <div className="space-y-4 text-[#9a8a72] leading-relaxed">
               <p>
-                Havana Club started with a single weekly Cuban Salsa class and a small group of dedicated students. Word spread fast — not because of marketing, but because people kept bringing their friends.
+                Habana Club started with a single weekly Cuban Salsa class and a small group of dedicated students. Word spread fast — not because of marketing, but because people kept bringing their friends.
               </p>
               <p>
                 Today we run classes seven days a week across multiple styles and levels. Students come for the dancing and stay for the people. That hasn't changed.

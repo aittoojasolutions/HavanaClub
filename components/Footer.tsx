@@ -63,7 +63,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-[#2a1f10] py-4 px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#9a8a72]">
-        <span>© {new Date().getFullYear()} Havana Club Dance Studio. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Habana Club Dance Studio. All rights reserved.</span>
         <div className="flex gap-4">
           <Link href="/privacy" className="hover:text-[#c8932a] transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-[#c8932a] transition-colors">Terms of Service</Link>

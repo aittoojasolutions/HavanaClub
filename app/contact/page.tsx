@@ -22,7 +22,7 @@ export default function ContactPage() {
         <p className="text-[#c8932a] uppercase tracking-widest text-xs font-semibold mb-3">Find Us</p>
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Studio Locations</h1>
         <p className="text-[#9a8a72] text-lg max-w-xl mx-auto">
-          We bring Havana Club to multiple locations across Helsinki — find the one that works best for you.
+          We bring Habana Club to multiple locations across Helsinki — find the one that works best for you.
         </p>
       </div>
 

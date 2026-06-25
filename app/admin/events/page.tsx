@@ -151,7 +151,7 @@ function EventForm({ initial, onSave, onCancel, password, isEdit }: {
         <div>
           <label className="block text-xs text-[#9a8a72] mb-1">Location</label>
           <input value={form.location} onChange={e => set('location', e.target.value)}
-            placeholder="Havana Club Studio, Helsinki"
+            placeholder="Habana Club Studio, Helsinki"
             className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
         </div>
         <div>

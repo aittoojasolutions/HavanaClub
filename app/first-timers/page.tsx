@@ -399,7 +399,7 @@ export default function FirstTimersPage() {
           style={{ backgroundImage: 'radial-gradient(circle at 20% 60%, #c8932a 0%, transparent 50%), radial-gradient(circle at 80% 30%, #8b4513 0%, transparent 40%)' }} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <div className="inline-block bg-[#c8932a]/10 border border-[#c8932a]/30 text-[#c8932a] text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-6">
-            First Time at Havana Club?
+            First Time at Habana Club?
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-5 leading-tight">
             Find Your New Hobby.
