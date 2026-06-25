@@ -42,11 +42,11 @@ function BookingContent() {
   const [step, setStep] = useState(1)
   const [role, setRole] = useState<'leader' | 'follower' | 'general'>('general')
   const [paymentType, setPaymentType] = useState<string>('')
-  const [phone, setPhone] = useState('')
   const [customer, setCustomer] = useState<CustomerData | null>(null)
   const [instanceId, setInstanceId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // phone removed — collected at trial signup, saved to profile
 
   // Auth gate — redirect to login if not signed in
   useEffect(() => {
@@ -88,7 +88,6 @@ function BookingContent() {
   }, [classId, date, router])
 
   async function handleBook() {
-    if (!phone.trim()) { setError('Please enter your phone number.'); return }
     if (!paymentType) { setError('Please select a payment method.'); return }
     setLoading(true)
     setError('')
@@ -248,18 +247,6 @@ function BookingContent() {
             {cls.is_pairwork && (
               <p className="text-[#9a8a72] text-sm">Joining as <span className="text-[#c8932a] font-medium capitalize">{role}</span></p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-xs text-[#9a8a72] mb-1.5">Phone number *</label>
-            <input
-              required
-              type="tel"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              placeholder="+358 40 123 4567"
-              className="w-full bg-[#141008] border border-[#2a1f10] rounded-xl px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none"
-            />
           </div>
 
           <div className="space-y-3">

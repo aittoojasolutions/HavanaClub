@@ -3,10 +3,13 @@ import { createServiceClient } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
-    const { trial_class_id, name, email, phone } = await request.json()
-    if (!trial_class_id || !name || !email) {
-      return NextResponse.json({ error: 'Name, email and class are required' }, { status: 400 })
+    const { trial_class_id, first_name, last_name, email, phone, age } = await request.json()
+    if (!trial_class_id || !first_name || !last_name || !email) {
+      return NextResponse.json({ error: 'First name, last name, and email are required' }, { status: 400 })
     }
+
+    const fullName = `${first_name.trim()} ${last_name.trim()}`
+    const cleanEmail = email.trim().toLowerCase()
 
     const db = createServiceClient()
 
@@ -26,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await db
       .from('trial_signups')
-      .insert({ trial_class_id, name: name.trim(), email: email.trim().toLowerCase(), phone })
+      .insert({ trial_class_id, name: fullName, email: cleanEmail, phone })
       .select()
       .single()
 
@@ -36,6 +39,16 @@ export async function POST(request: NextRequest) {
       }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Save/update customer profile
+    await db.from('customers').upsert({
+      email: cleanEmail,
+      name: fullName,
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      phone: phone?.trim() || null,
+      age: age ? parseInt(age) : null,
+    }, { onConflict: 'email' })
 
     return NextResponse.json({ signup: data }, { status: 201 })
   } catch {

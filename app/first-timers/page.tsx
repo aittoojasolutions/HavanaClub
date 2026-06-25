@@ -38,9 +38,11 @@ function SignupModal({ cls, onClose, onSuccess }: {
   onClose: () => void
   onSuccess: () => void
 }) {
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [age, setAge] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const taken = cls.trial_signups?.[0]?.count ?? 0
@@ -52,7 +54,7 @@ function SignupModal({ cls, onClose, onSuccess }: {
     const res = await fetch('/api/trial-signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ trial_class_id: cls.id, name, email, phone }),
+      body: JSON.stringify({ trial_class_id: cls.id, first_name: firstName, last_name: lastName, email, phone, age }),
     })
     const data = await res.json()
     if (!res.ok) { setError(data.error || 'Signup failed'); setLoading(false); return }
@@ -97,11 +99,17 @@ function SignupModal({ cls, onClose, onSuccess }: {
         )}
 
         <form onSubmit={submit} className="space-y-3">
-          <input required value={name} onChange={e => setName(e.target.value)} placeholder="Full Name *"
-            className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
+          <div className="grid grid-cols-2 gap-3">
+            <input required value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name *"
+              className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
+            <input required value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name *"
+              className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
+          </div>
           <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address *"
             className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
-          <input required type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number *"
+          <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number"
+            className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
+          <input type="number" min="10" max="99" value={age} onChange={e => setAge(e.target.value)} placeholder="Age (optional)"
             className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-4 py-3 text-[#f5f0e8] placeholder-[#4a3a28] focus:border-[#c8932a] focus:outline-none" />
           <button type="submit" disabled={loading}
             className="w-full bg-[#c8932a] text-[#0a0805] py-3.5 rounded-lg font-bold text-lg hover:bg-[#a87820] transition-colors disabled:opacity-50">

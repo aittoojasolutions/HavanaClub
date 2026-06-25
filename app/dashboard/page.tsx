@@ -24,6 +24,10 @@ interface Booking {
 
 interface Customer {
   name: string
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  age: number | null
   subscription_tier: number | null
   pack_credits_remaining: number
   pack_expires_at: string | null
@@ -48,6 +52,10 @@ export default function DashboardPage() {
   const [cancelData, setCancelData] = useState<{ cancelAt: string; pastMinimum: boolean } | null>(null)
   const [cancelWorking, setCancelWorking] = useState(false)
   const [convertData, setConvertData] = useState<{ credits: number; expiresAt: string } | null>(null)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({ first_name: '', last_name: '', phone: '', age: '' })
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileMsg, setProfileMsg] = useState('')
 
   useEffect(() => {
     const supabase = createClient()
@@ -63,6 +71,14 @@ export default function DashboardPage() {
       const bookData = await bookRes.json()
       setCustomer(custData.customer)
       setBookings(bookData.bookings || [])
+      if (custData.customer) {
+        setProfileForm({
+          first_name: custData.customer.first_name || '',
+          last_name: custData.customer.last_name || '',
+          phone: custData.customer.phone || '',
+          age: custData.customer.age?.toString() || '',
+        })
+      }
       setLoading(false)
     })
   }, [router])
@@ -120,6 +136,29 @@ export default function DashboardPage() {
       setConvertData(data)
       setCancelStep('done')
       await refreshCustomer(user.email)
+    }
+  }
+
+  async function saveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user) return
+    setProfileSaving(true); setProfileMsg('')
+    const res = await fetch(`/api/customer?email=${encodeURIComponent(user.email)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        first_name: profileForm.first_name,
+        last_name: profileForm.last_name,
+        phone: profileForm.phone,
+        age: profileForm.age ? parseInt(profileForm.age) : null,
+      }),
+    })
+    setProfileSaving(false)
+    if (res.ok) {
+      const data = await res.json()
+      setCustomer(prev => prev ? { ...prev, ...data.customer } : data.customer)
+      setEditingProfile(false)
+      setProfileMsg('Profile updated.')
     }
   }
 
@@ -233,6 +272,78 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Profile */}
+      <div className="mt-10 border-t border-[#2a1f10] pt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">My Profile</h2>
+          {!editingProfile && (
+            <button onClick={() => { setEditingProfile(true); setProfileMsg('') }}
+              className="text-sm text-[#c8932a] hover:underline">Edit</button>
+          )}
+        </div>
+
+        {profileMsg && (
+          <div className="text-green-400 text-sm mb-4">{profileMsg}</div>
+        )}
+
+        {editingProfile ? (
+          <form onSubmit={saveProfile} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-[#9a8a72] mb-1">First name</label>
+                <input value={profileForm.first_name} onChange={e => setProfileForm(p => ({ ...p, first_name: e.target.value }))}
+                  placeholder="First name"
+                  className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs text-[#9a8a72] mb-1">Last name</label>
+                <input value={profileForm.last_name} onChange={e => setProfileForm(p => ({ ...p, last_name: e.target.value }))}
+                  placeholder="Last name"
+                  className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-[#9a8a72] mb-1">Phone</label>
+              <input type="tel" value={profileForm.phone} onChange={e => setProfileForm(p => ({ ...p, phone: e.target.value }))}
+                placeholder="+358 40 123 4567"
+                className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-[#9a8a72] mb-1">Age</label>
+              <input type="number" min="10" max="99" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))}
+                placeholder="Age"
+                className="w-full bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-[#9a8a72] mb-1">Email</label>
+              <div className="bg-[#0a0805] border border-[#2a1f10] rounded-lg px-3 py-2.5 text-[#9a8a72] text-sm">{user?.email}</div>
+            </div>
+            <div className="flex gap-3 pt-1">
+              <button type="submit" disabled={profileSaving}
+                className="bg-[#c8932a] text-[#0a0805] px-5 py-2 rounded-lg font-bold text-sm hover:bg-[#a87820] transition-colors disabled:opacity-50">
+                {profileSaving ? 'Saving…' : 'Save'}
+              </button>
+              <button type="button" onClick={() => setEditingProfile(false)}
+                className="text-sm text-[#9a8a72] hover:text-[#f5f0e8] transition-colors">Cancel</button>
+            </div>
+          </form>
+        ) : (
+          <div className="bg-[#141008] border border-[#2a1f10] rounded-xl p-5 space-y-3 text-sm">
+            {[
+              { label: 'Name', value: customer?.first_name ? `${customer.first_name} ${customer.last_name || ''}`.trim() : customer?.name },
+              { label: 'Email', value: user?.email },
+              { label: 'Phone', value: customer?.phone || '—' },
+              { label: 'Age', value: customer?.age?.toString() || '—' },
+            ].map(row => (
+              <div key={row.label} className="flex justify-between">
+                <span className="text-[#9a8a72]">{row.label}</span>
+                <span className="text-[#f5f0e8]">{row.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Cancel subscription modal */}
       {cancelStep !== 'idle' && (
