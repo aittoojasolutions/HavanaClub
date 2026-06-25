@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const db = createServiceClient()
   let query = db
     .from('customers')
-    .select('id, email, name, pack_credits_remaining, subscription_tier, stripe_customer_id, created_at')
+    .select('id, email, name, pack_credits_remaining, pack_expires_at, pack_credits_lapsed, subscription_tier, stripe_customer_id, created_at')
     .order('created_at', { ascending: false })
     .limit(50)
 
@@ -29,13 +29,15 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   if (!checkAdmin(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await request.json()
-  const { id, pack_credits_remaining, subscription_tier, name } = body
+  const { id, pack_credits_remaining, pack_expires_at, pack_credits_lapsed, subscription_tier, name } = body
 
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
   const db = createServiceClient()
   const updates: Record<string, unknown> = {}
   if (pack_credits_remaining !== undefined) updates.pack_credits_remaining = pack_credits_remaining
+  if (pack_expires_at !== undefined) updates.pack_expires_at = pack_expires_at || null
+  if (pack_credits_lapsed !== undefined) updates.pack_credits_lapsed = pack_credits_lapsed
   if (subscription_tier !== undefined) updates.subscription_tier = subscription_tier === 0 ? null : subscription_tier
   if (name !== undefined) updates.name = name
 

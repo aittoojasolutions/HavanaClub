@@ -7,6 +7,8 @@ interface Member {
   email: string
   name: string
   pack_credits_remaining: number
+  pack_expires_at: string | null
+  pack_credits_lapsed: number
   subscription_tier: number | null
   stripe_customer_id: string | null
   created_at: string
@@ -26,10 +28,16 @@ interface Booking {
 
 const SUB_OPTIONS = [
   { value: 0, label: 'None' },
-  { value: 1, label: '1× / week — €65/mo' },
-  { value: 2, label: '2× / week — €89/mo' },
-  { value: 3, label: '3× / week — €109/mo' },
+  { value: 1, label: '1× / week — €79/mo' },
+  { value: 2, label: '2× / week — €129/mo' },
+  { value: 3, label: '3× / week — €169/mo' },
 ]
+
+function addMonths(months: number): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() + months)
+  return d.toISOString().slice(0, 10)
+}
 
 function MemberDrawer({ member, password, onClose, onSaved }: {
   member: Member
@@ -38,12 +46,15 @@ function MemberDrawer({ member, password, onClose, onSaved }: {
   onSaved: (m: Member) => void
 }) {
   const [credits, setCredits] = useState(member.pack_credits_remaining)
+  const [expiryDate, setExpiryDate] = useState(member.pack_expires_at ? member.pack_expires_at.slice(0, 10) : '')
   const [tier, setTier] = useState(member.subscription_tier ?? 0)
   const [name, setName] = useState(member.name)
   const [bookings, setBookings] = useState<Booking[]>([])
   const [saving, setSaving] = useState(false)
   const [creditDelta, setCreditDelta] = useState('')
   const [saved, setSaved] = useState(false)
+
+  const packExpired = expiryDate ? new Date(expiryDate) < new Date() : false
 
   useEffect(() => {
     fetch(`/api/admin/bookings?email=${encodeURIComponent(member.email)}`, {
@@ -60,7 +71,7 @@ function MemberDrawer({ member, password, onClose, onSaved }: {
     const res = await fetch('/api/admin/members', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
-      body: JSON.stringify({ id: member.id, pack_credits_remaining: credits, subscription_tier: tier, name }),
+      body: JSON.stringify({ id: member.id, pack_credits_remaining: credits, pack_expires_at: expiryDate || null, subscription_tier: tier, name }),
     })
     const data = await res.json()
     if (res.ok) { onSaved(data.member); setSaved(true); setTimeout(() => setSaved(false), 2000) }
@@ -144,6 +155,30 @@ function MemberDrawer({ member, password, onClose, onSaved }: {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm text-[#9a8a72] mb-2">Pack Expiry Date</label>
+            <div className="flex gap-1 mb-2 flex-wrap">
+              {[{ label: '+2 mo', months: 2 }, { label: '+3 mo', months: 3 }, { label: '+6 mo', months: 6 }].map(({ label, months }) => (
+                <button key={months} onClick={() => setExpiryDate(addMonths(months))}
+                  className="text-xs px-2 py-1 rounded border border-[#c8932a]/40 text-[#c8932a] hover:bg-[#c8932a]/10 transition-colors">
+                  {label}
+                </button>
+              ))}
+              <button onClick={() => setExpiryDate('')}
+                className="text-xs px-2 py-1 rounded border border-red-700/40 text-red-400 hover:bg-red-900/10 transition-colors">
+                Clear
+              </button>
+            </div>
+            <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)}
+              className={`w-full bg-[#0a0805] border rounded-lg px-3 py-2 text-[#f5f0e8] focus:border-[#c8932a] focus:outline-none text-sm ${packExpired ? 'border-red-700/50' : 'border-[#2a1f10]'}`} />
+            {packExpired && expiryDate && (
+              <p className="text-xs text-red-400 mt-1">Pack is expired — set a future date to reactivate</p>
+            )}
+            {!expiryDate && (
+              <p className="text-xs text-[#9a8a72] mt-1">No expiry set — credits added manually won&apos;t expire</p>
+            )}
+          </div>
+
           <button onClick={save} disabled={saving}
             className="w-full bg-[#c8932a] text-[#0a0805] py-2.5 rounded-lg font-bold hover:bg-[#a87820] transition-colors disabled:opacity-50">
             {saving ? 'Saving…' : 'Save Changes'}
@@ -198,9 +233,9 @@ export default function AdminMembersPage() {
   const [selected, setSelected] = useState<Member | null>(null)
 
   const DEMO_MEMBERS: Member[] = [
-    { id: 'demo-1', email: 'anna.k.test@example.com', name: 'Anna Korhonen (test)', pack_credits_remaining: 6, subscription_tier: null, stripe_customer_id: null, created_at: '2026-04-10T10:00:00Z' },
-    { id: 'demo-2', email: 'mikael.p.test@example.com', name: 'Mikael Peltonen (test)', pack_credits_remaining: 0, subscription_tier: 2, stripe_customer_id: 'cus_test123', created_at: '2026-03-22T14:30:00Z' },
-    { id: 'demo-3', email: 'laura.s.test@example.com', name: 'Laura Saarinen (test)', pack_credits_remaining: 14, subscription_tier: 3, stripe_customer_id: 'cus_test456', created_at: '2026-05-01T09:15:00Z' },
+    { id: 'demo-1', email: 'anna.k.test@example.com', name: 'Anna Korhonen (test)', pack_credits_remaining: 6, pack_expires_at: '2026-08-10T00:00:00Z', pack_credits_lapsed: 0, subscription_tier: null, stripe_customer_id: null, created_at: '2026-04-10T10:00:00Z' },
+    { id: 'demo-2', email: 'mikael.p.test@example.com', name: 'Mikael Peltonen (test)', pack_credits_remaining: 0, pack_expires_at: null, pack_credits_lapsed: 0, subscription_tier: 2, stripe_customer_id: 'cus_test123', created_at: '2026-03-22T14:30:00Z' },
+    { id: 'demo-3', email: 'laura.s.test@example.com', name: 'Laura Saarinen (test)', pack_credits_remaining: 14, pack_expires_at: '2026-09-01T00:00:00Z', pack_credits_lapsed: 0, subscription_tier: 3, stripe_customer_id: 'cus_test456', created_at: '2026-05-01T09:15:00Z' },
   ]
 
   const fetchMembers = useCallback(async (q: string) => {
