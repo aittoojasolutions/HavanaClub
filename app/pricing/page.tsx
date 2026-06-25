@@ -37,17 +37,22 @@ export default function PricingPage() {
 
   async function goToCheckout(type: string, userEmail: string, userName: string) {
     setLoading(type)
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, email: userEmail, name: userName }),
-    })
-    const data = await res.json()
-    if (data.url) {
-      window.location.href = data.url
-    } else {
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, email: userEmail, name: userName }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setLoading(null)
+        alert(data.error || 'Something went wrong. Please try again.')
+      }
+    } catch {
       setLoading(null)
-      setModalError(data.error || 'Something went wrong. Please try again.')
+      alert('Something went wrong. Please try again.')
     }
   }
 

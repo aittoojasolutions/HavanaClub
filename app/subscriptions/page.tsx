@@ -96,14 +96,19 @@ export default function SubscriptionsPage() {
 
   async function goToCheckout(key: string, userEmail: string, userName: string) {
     setLoading(true)
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: key, email: userEmail, name: userName }),
-    })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else { setLoading(false); setModalError(data.error || 'Something went wrong.') }
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: key, email: userEmail, name: userName }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else { setLoading(false); setModalError(data.error || 'Something went wrong.') }
+    } catch {
+      setLoading(false)
+      setModalError('Something went wrong. Please try again.')
+    }
   }
 
   async function submitModal() {
