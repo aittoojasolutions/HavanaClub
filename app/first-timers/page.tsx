@@ -138,7 +138,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
         <p className="text-[#9a8a72] mb-5">Confirmation sent to your email. See you on the dance floor!</p>
         <div className="bg-[#0a0805] border border-[#2a1f10] rounded-xl p-4 mb-6 text-sm text-left space-y-1.5">
           <div className="text-[#c8932a] font-semibold mb-2">Before you come:</div>
-          <div className="text-[#9a8a72]">• Arrive 10 min early, wear comfortable clothes</div>
+          <div className="text-[#9a8a72]">• Arrive 10 min early, wear comfortable clothes and indoor shoes</div>
           <div className="text-[#9a8a72]">• Pay <strong className="text-[#f5f0e8]">€10 cash or card on site</strong> after the class</div>
           <div className="text-[#9a8a72]">• Join any plan → <strong className="text-[#c8932a]">€10 trial fee waived</strong></div>
         </div>
