@@ -142,12 +142,16 @@ export default function SubscriptionsPage() {
               <div className="text-[#9a8a72] text-sm mb-1">Monthly price</div>
               <div className="text-5xl font-bold text-[#c8932a] mb-1">{current.price}</div>
               <div className="text-[#c8932a] text-sm font-medium mb-1">{current.perHour}</div>
-              <div className="text-[#9a8a72] text-xs mb-6">per month · cancel anytime</div>
+              <div className="text-[#9a8a72] text-xs mb-4">per month · 3-month minimum</div>
+              <div className="bg-[#c8932a]/5 border border-[#c8932a]/20 rounded-lg px-3 py-2.5 text-xs text-[#9a8a72] mb-4 text-left">
+                <div className="text-[#c8932a] font-semibold mb-1">How billing works</div>
+                Your first charge covers the remaining days of this month (prorated). From the 1st of next month, you&apos;ll be billed {current.price} on the 1st of each month.
+              </div>
               <button onClick={() => startCheckout(current.key)} disabled={loading}
                 className="w-full bg-[#c8932a] text-[#0a0805] py-3 rounded-lg font-bold hover:bg-[#a87820] transition-colors disabled:opacity-50">
                 {loading ? 'Loading…' : 'Start Membership'}
               </button>
-              <div className="text-[#9a8a72] text-xs mt-3">No contracts. Cancel anytime.</div>
+              <div className="text-[#9a8a72] text-xs mt-3">3-month minimum · cancel anytime after</div>
             </div>
           </div>
         </div>
@@ -170,7 +174,7 @@ export default function SubscriptionsPage() {
             </thead>
             <tbody>
               {[
-                ['Monthly price', '€65', '€89', '€109'],
+                ['Monthly price', '€79', '€129', '€169'],
                 ['Classes per week', '1', '2', '3'],
                 ['Any day (Mon–Sun)', '✓', '✓', '✓'],
                 ['Cuban Salsa & Bachata', '✓', '✓', '✓'],

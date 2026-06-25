@@ -62,11 +62,22 @@ export async function POST(request: NextRequest) {
     const tierMap = { sub_1x: 1, sub_2x: 2, sub_3x: 3 }
     const sub = subMap[type as keyof typeof subMap]
     const tier = tierMap[type as keyof typeof tierMap]
+
+    // Bill on the 1st of each month — anchor to next month's 1st
+    const now = new Date()
+    const nextFirst = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
+    const billingAnchor = Math.floor(nextFirst.getTime() / 1000)
+
     session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: sub.priceId, quantity: 1 }],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      subscription_data: {
+        billing_cycle_anchor: billingAnchor,
+        proration_behavior: 'create_prorations',
+      } as any,
       success_url: `${baseUrl}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/subscriptions`,
       metadata: { ...metadata, tier: String(tier) },
