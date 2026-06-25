@@ -51,6 +51,8 @@ export interface Customer {
   name: string
   stripe_customer_id: string | null
   pack_credits_remaining: number
+  pack_expires_at: string | null
+  pack_credits_lapsed: number
   subscription_tier: 1 | 2 | 3 | null
   subscription_stripe_id: string | null
   created_at: string

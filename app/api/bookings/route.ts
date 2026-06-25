@@ -45,12 +45,17 @@ export async function POST(request: NextRequest) {
   if (booking_type === 'pack') {
     const { data: customer } = await db
       .from('customers')
-      .select('pack_credits_remaining')
+      .select('pack_credits_remaining, pack_expires_at')
       .eq('email', customer_email)
       .single()
 
     if (!customer || customer.pack_credits_remaining < 1) {
       return NextResponse.json({ error: 'No credits remaining' }, { status: 402 })
+    }
+
+    const packExpired = customer.pack_expires_at && new Date(customer.pack_expires_at) < new Date()
+    if (packExpired) {
+      return NextResponse.json({ error: 'Your class pack has expired. Buy a new pack to reactivate your credits.' }, { status: 402 })
     }
 
     // Deduct credit

@@ -41,13 +41,34 @@ export async function POST(request: NextRequest) {
           .update({ [spotField]: db.rpc('increment_spot') })
           .eq('id', meta.classInstanceId)
       } else if (meta.classes) {
-        // Class pack — add credits
-        const credits = parseInt(meta.classes)
+        // Class pack — add credits with expiry handling
+        const newCredits = parseInt(meta.classes)
+        const validityMonths: Record<number, number> = { 8: 2, 16: 3, 32: 6 }
+        const months = validityMonths[newCredits] ?? 2
+
         const { data: existing } = await db
-          .from('customers').select('pack_credits_remaining').eq('email', meta.email).single()
-        const current = existing?.pack_credits_remaining || 0
-        await db.from('customers')
-          .upsert({ email: meta.email, name: meta.name, pack_credits_remaining: current + credits })
+          .from('customers')
+          .select('pack_credits_remaining, pack_expires_at, pack_credits_lapsed')
+          .eq('email', meta.email).single()
+
+        const now = new Date()
+        const currentExpiry = existing?.pack_expires_at ? new Date(existing.pack_expires_at) : null
+        const isExpired = currentExpiry ? currentExpiry < now : false
+        const activeCredits = isExpired ? 0 : (existing?.pack_credits_remaining || 0)
+        const lapsedFromExpiry = isExpired ? (existing?.pack_credits_remaining || 0) : 0
+        const previousLapsed = existing?.pack_credits_lapsed || 0
+        const totalLapsed = lapsedFromExpiry + previousLapsed
+
+        const newExpiry = new Date()
+        newExpiry.setMonth(newExpiry.getMonth() + months)
+
+        await db.from('customers').upsert({
+          email: meta.email,
+          name: meta.name,
+          pack_credits_remaining: activeCredits + newCredits + totalLapsed,
+          pack_expires_at: newExpiry.toISOString(),
+          pack_credits_lapsed: 0,
+        })
       }
     } else if (session.mode === 'subscription' && meta.tier) {
       await db.from('customers').upsert({

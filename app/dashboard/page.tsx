@@ -26,12 +26,14 @@ interface Customer {
   name: string
   subscription_tier: number | null
   pack_credits_remaining: number
+  pack_expires_at: string | null
+  pack_credits_lapsed: number
 }
 
 const SUB_LABELS: Record<number, string> = {
-  1: '1× per week — €65/mo',
-  2: '2× per week — €89/mo',
-  3: '3× per week — €109/mo',
+  1: '1× per week — €79/mo',
+  2: '2× per week — €129/mo',
+  3: '3× per week — €169/mo',
 }
 
 export default function DashboardPage() {
@@ -87,6 +89,13 @@ export default function DashboardPage() {
   const upcoming = bookings.filter(b => new Date(b.class_instances?.date) >= new Date())
   const past = bookings.filter(b => new Date(b.class_instances?.date) < new Date()).slice(0, 5)
 
+  const now = new Date()
+  const expiryDate = customer?.pack_expires_at ? new Date(customer.pack_expires_at) : null
+  const packExpired = expiryDate ? expiryDate < now : false
+  const daysUntilExpiry = expiryDate && !packExpired
+    ? Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : null
+
   return (
     <div className="pt-24 pb-16 px-4 max-w-3xl mx-auto">
       {/* Header */}
@@ -104,14 +113,32 @@ export default function DashboardPage() {
 
       {/* Status cards */}
       <div className="grid grid-cols-2 gap-4 mb-10">
-        <div className="bg-[#141008] border border-[#2a1f10] rounded-xl p-5">
+        <div className={`bg-[#141008] rounded-xl p-5 border-2 ${packExpired ? 'border-red-700/50' : daysUntilExpiry !== null && daysUntilExpiry <= 14 ? 'border-amber-600/50' : 'border-[#2a1f10]'}`}>
           <div className="text-[#9a8a72] text-sm mb-1">Class Credits</div>
-          <div className="text-4xl font-bold text-[#c8932a]">{customer?.pack_credits_remaining ?? 0}</div>
-          <div className="text-[#9a8a72] text-xs mt-1">remaining</div>
-          {(customer?.pack_credits_remaining ?? 0) === 0 && (
-            <Link href="/pricing" className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">
-              Buy a pack →
-            </Link>
+          <div className={`text-4xl font-bold ${packExpired ? 'text-red-400' : 'text-[#c8932a]'}`}>{customer?.pack_credits_remaining ?? 0}</div>
+          {packExpired ? (
+            <>
+              <div className="text-red-400 text-xs mt-1">Pack expired</div>
+              {(customer?.pack_credits_lapsed ?? 0) > 0 && (
+                <div className="text-[#9a8a72] text-xs mt-1">{customer!.pack_credits_lapsed} credit{customer!.pack_credits_lapsed > 1 ? 's' : ''} will be restored on next purchase</div>
+              )}
+              <Link href="/pricing" className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">Buy a pack to reactivate →</Link>
+            </>
+          ) : customer?.pack_expires_at ? (
+            <>
+              <div className={`text-xs mt-1 ${daysUntilExpiry !== null && daysUntilExpiry <= 14 ? 'text-amber-400' : 'text-[#9a8a72]'}`}>
+                Expires {new Date(customer.pack_expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                {daysUntilExpiry !== null && daysUntilExpiry <= 14 && ` — ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''} left`}
+              </div>
+              {daysUntilExpiry !== null && daysUntilExpiry <= 14 && (
+                <Link href="/pricing" className="text-xs text-amber-400 hover:underline mt-1 inline-block">Top up now →</Link>
+              )}
+            </>
+          ) : (
+            <div className="text-[#9a8a72] text-xs mt-1">remaining</div>
+          )}
+          {(customer?.pack_credits_remaining ?? 0) === 0 && !packExpired && (
+            <Link href="/pricing" className="text-xs text-[#c8932a] hover:underline mt-2 inline-block">Buy a pack →</Link>
           )}
         </div>
         <div className="bg-[#141008] border border-[#2a1f10] rounded-xl p-5">
