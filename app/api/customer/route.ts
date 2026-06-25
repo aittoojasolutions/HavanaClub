@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const db = createServiceClient()
   const { data: customer } = await db
     .from('customers')
-    .select('name, subscription_tier, pack_credits_remaining')
+    .select('name, subscription_tier, pack_credits_remaining, pack_expires_at, pack_credits_lapsed')
     .eq('email', email)
     .single()
 

@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           pack_credits_remaining: activeCredits + newCredits + totalLapsed,
           pack_expires_at: newExpiry.toISOString(),
           pack_credits_lapsed: 0,
-        })
+        }, { onConflict: 'email' })
       }
     } else if (session.mode === 'subscription' && meta.tier) {
       await db.from('customers').upsert({
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         name: meta.name,
         subscription_tier: parseInt(meta.tier),
         subscription_stripe_id: session.subscription as string,
-      })
+      }, { onConflict: 'email' })
     }
   }
 
