@@ -64,7 +64,7 @@ function LoginForm() {
     <>
       <div className="text-center mb-8">
         <Link href="/" className="inline-block text-2xl font-bold text-[#c8932a] tracking-wider mb-6">
-          HAVANA CLUB
+          HABANA CLUB
         </Link>
         <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
         <p className="text-[#9a8a72] text-sm">Enter your email and we&apos;ll send you a login link — no password needed.</p>
